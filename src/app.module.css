@@ -1,0 +1,7 @@
+.connection {
+  display: flex;
+}
+
+.connection div {
+  margin-left: 8px;
+}

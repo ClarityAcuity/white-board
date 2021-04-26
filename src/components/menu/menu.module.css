@@ -1,0 +1,14 @@
+.menu {
+  display: flex;
+}
+
+.line,
+.rect {
+  margin-right: 8px;
+}
+
+.rect--drawing,
+.line--drawing {
+  background: black;
+  color: white;
+}

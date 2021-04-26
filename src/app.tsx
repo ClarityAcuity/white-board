@@ -1,14 +1,14 @@
 import React, { useState, useEffect, ReactElement } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  startConnect,
-  closeConnect,
-  messageRoomAction,
-  joinRoomAction,
-} from "./actions";
+import { connectActions, chatActions } from "./actions";
 import { RootState } from "./repositories/redux/reducer";
 import { BoardState } from "./repositories/redux/reducer/board";
 import { ConnectionState } from "./repositories/redux/reducer/connection";
+import WhiteBoard from "./components/white-board";
+import styles from './app.module.css'
+
+const { startConnect, closeConnect, joinRoomAction } = connectActions;
+const { messageRoomAction } = chatActions;
 
 function Board(): ReactElement {
   const [input, setInput] = useState("");
@@ -18,9 +18,8 @@ function Board(): ReactElement {
   const connectionReducer = useSelector<RootState, ConnectionState>(
     (state) => state.connectionReducer
   );
-  const { messages } = boardReducer;
-  const { room } = connectionReducer;
-  console.log(boardReducer, messages);
+  const { messages, drawings } = boardReducer;
+  const { connection, room } = connectionReducer;
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -53,14 +52,16 @@ function Board(): ReactElement {
 
   return (
     <>
-      <div>
+      <div className={styles.connection}>
         <button onClick={_handleConnect}>Connect</button>
         <button onClick={_handleDisconnect}>Disconnect</button>
         <select value={room} onChange={_handleChangeRoom}>
           <option value={"room1"}>room1</option>
           <option value={"room2"}>room2</option>
         </select>
+        <div>{`isConnection: ${connection}${connection? `, ${room}`: ''}`}</div>
       </div>
+      <WhiteBoard width={500} height={500} drawings={drawings} />
       {messages.map((message, index) => (
         <div key={index}>{message}</div>
       ))}

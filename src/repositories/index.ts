@@ -10,11 +10,11 @@ import thunkMiddleware from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { socket } from "../socket";
 import {
-  UPDATE_BROADCAST_MESSAGE,
-  UPDATE_ROOM_MESSAGE,
-  UPDATE_SELF_MESSAGE,
+  RECEIVE_BROADCAST_MESSAGE,
+  RECEIVE_ROOM_MESSAGE,
+  RECEIVE_SELF_MESSAGE,
   UPDATE_ROOM,
-  UPDATE_DRAW,
+  RECEIVE_UPDATE_DRAW,
 } from "../actions/action-types";
 
 type AnyFunction = (...args: unknown[]) => unknown;
@@ -22,11 +22,11 @@ type Option = string | AnyFunction | Array<string>;
 
 // events for registering
 const events = [
-  UPDATE_BROADCAST_MESSAGE,
-  UPDATE_ROOM_MESSAGE,
-  UPDATE_SELF_MESSAGE,
+  RECEIVE_BROADCAST_MESSAGE,
+  RECEIVE_ROOM_MESSAGE,
+  RECEIVE_SELF_MESSAGE,
   UPDATE_ROOM,
-  UPDATE_DRAW,
+  RECEIVE_UPDATE_DRAW,
 ];
 
 function createSocketIoMiddleware(
@@ -45,6 +45,7 @@ function createSocketIoMiddleware(
       })
     );
     return (next: Dispatch) => (action: AnyAction) => {
+      console.log(action)
       if (evaluate(action, criteria) && socket.connected) {
         return execute(action, emitBound, next, dispatch);
       }

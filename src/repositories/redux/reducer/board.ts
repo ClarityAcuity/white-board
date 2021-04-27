@@ -1,14 +1,16 @@
 import {
   BROADCAST_MESSAGE,
-  UPDATE_BROADCAST_MESSAGE,
+  RECEIVE_BROADCAST_MESSAGE,
   MESSAGE_ROOM,
-  UPDATE_ROOM_MESSAGE,
+  RECEIVE_ROOM_MESSAGE,
   MESSAGE_SELF,
-  UPDATE_SELF_MESSAGE,
+  RECEIVE_SELF_MESSAGE,
   JOIN_ROOM,
-  UPDATE_ROOM,
   CREATE_DRAW,
   UPDATE_DRAW,
+  FINISH_DRAW,
+  RECEIVE_UPDATE_DRAW,
+  DrawStatusEnums,
   Action,
   Draw,
   LineDraw,
@@ -20,12 +22,15 @@ export type BoardState = {
   drawings: Array<LineDraw | RectDraw | Draw>;
 };
 
+const { CREATED, FINISHED } = DrawStatusEnums;
+
 const initialState = {
   messages: [],
   drawings: [
     {
       id: "1",
       type: "line",
+      status: "finished",
       x1: 0,
       y1: 80,
       x2: 100,
@@ -34,6 +39,7 @@ const initialState = {
     {
       id: "2",
       type: "rect",
+      status: "finished",
       width: 100,
       height: 100,
       x: 120,
@@ -52,10 +58,9 @@ export default function boardReducer(
     case MESSAGE_SELF:
     case JOIN_ROOM:
       return state;
-    case UPDATE_BROADCAST_MESSAGE:
-    case UPDATE_ROOM_MESSAGE:
-    case UPDATE_SELF_MESSAGE:
-    case UPDATE_ROOM: {
+    case RECEIVE_BROADCAST_MESSAGE:
+    case RECEIVE_ROOM_MESSAGE:
+    case RECEIVE_SELF_MESSAGE: {
       const { message } = action;
 
       return {
@@ -67,15 +72,16 @@ export default function boardReducer(
     case CREATE_DRAW: {
       const { draw: newDraw } = action;
 
-      return { ...state, drawings: [...state.drawings, newDraw] };
+      return {
+        ...state,
+        drawings: [...state.drawings, newDraw],
+      };
     }
     case UPDATE_DRAW: {
       const { draw: newDraw } = action;
-      const { drawings } = state;
-      let hasDraw;
-      const updatedDrawings = drawings.map((draw) => {
-        if (draw.id === newDraw.id) {
-          hasDraw = true;
+      const { drawings: prevDrawings } = state;
+      const drawings = prevDrawings.map((draw) => {
+        if (draw.id === newDraw.id && draw.status !== FINISHED) {
           return newDraw;
         }
         return draw;
@@ -83,7 +89,37 @@ export default function boardReducer(
 
       return {
         ...state,
-        drawings: hasDraw ? updatedDrawings : [...updatedDrawings, newDraw],
+        drawings,
+      };
+    }
+    case FINISH_DRAW: {
+      const { draw: newDraw } = action;
+      const { drawings: prevDrawings } = state;
+      const drawings = prevDrawings.map((draw) => {
+        if (draw.id === newDraw.id && draw.status !== newDraw.status) {
+          return { ...newDraw };
+        }
+        return draw;
+      });
+
+      return {
+        ...state,
+        drawings,
+      };
+    }
+    case RECEIVE_UPDATE_DRAW: {
+      const { draw: newDraw } = action;
+      const { drawings } = state;
+      const updatedDrawings = drawings.map((draw) => {
+        if (draw.id === newDraw.id && draw.status !== FINISHED) {
+          return newDraw;
+        }
+        return draw;
+      });
+
+      return {
+        ...state,
+        drawings: newDraw.status !== CREATED ? updatedDrawings : [...drawings, newDraw],
       };
     }
 

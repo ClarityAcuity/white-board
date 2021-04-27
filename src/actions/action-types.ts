@@ -9,10 +9,13 @@ export type Emitter = (dispatch: Dispatch, getState: GetState) => void;
 export type Line = "line";
 export type Rect = "rect";
 export type Mode = Line | Rect;
-
+export type CREATED = "created"
+export type UPDATED = "updated"
+export type FINISHED = "finished"
 export interface Draw {
   id: string;
   type: Line | Rect;
+  status: CREATED | UPDATED | FINISHED
 }
 export interface LineDraw extends Draw {
   type: Line;
@@ -40,13 +43,21 @@ export const CONNECT = "CONNECT";
 export const DISCONNECT = "DISCONNECT";
 
 export const BROADCAST_MESSAGE = "BROADCAST_MESSAGE";
-export const UPDATE_BROADCAST_MESSAGE = "UPDATE_BROADCAST_MESSAGE";
+export const RECEIVE_BROADCAST_MESSAGE = "RECEIVE_BROADCAST_MESSAGE";
 export const MESSAGE_ROOM = "MESSAGE_ROOM";
-export const UPDATE_ROOM_MESSAGE = "UPDATE_ROOM_MESSAGE";
+export const RECEIVE_ROOM_MESSAGE = "RECEIVE_ROOM_MESSAGE";
 export const MESSAGE_SELF = "MESSAGE_SELF";
-export const UPDATE_SELF_MESSAGE = "UPDATE_SELF_MESSAGE";
+export const RECEIVE_SELF_MESSAGE = "RECEIVE_SELF_MESSAGE";
 export const JOIN_ROOM = "JOIN_ROOM";
 export const UPDATE_ROOM = "UPDATE_ROOM";
 
 export const CREATE_DRAW = "CREATE_DRAW";
 export const UPDATE_DRAW = "UPDATE_DRAW";
+export const FINISH_DRAW = "FINISH_DRAW";
+export const RECEIVE_UPDATE_DRAW = "RECEIVE_UPDATE_DRAW";
+
+export const DrawStatusEnums = {
+  CREATED: "created" as CREATED,
+  UPDATED: "updated" as UPDATED,
+  FINISHED: "finished" as FINISHED,
+}

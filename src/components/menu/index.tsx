@@ -3,7 +3,7 @@ import cx from "classnames";
 import { Mode } from "../../actions/action-types";
 import styles from './menu.module.css'
 
-type Menu = {
+interface Menu {
   mode: Mode;
   onChange: (mode: Mode) => void;
 };

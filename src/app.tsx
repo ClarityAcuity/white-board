@@ -1,16 +1,16 @@
-import React, { useState, useEffect, ReactElement } from "react";
+import React, { useState, ReactElement } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { connectActions, chatActions } from "./actions";
 import { RootState } from "./repositories/redux/reducer";
 import { BoardState } from "./repositories/redux/reducer/board";
 import { ConnectionState } from "./repositories/redux/reducer/connection";
 import WhiteBoard from "./components/white-board";
-import styles from './app.module.css'
+import styles from "./app.module.css";
 
 const { startConnect, closeConnect, joinRoomAction } = connectActions;
 const { messageRoomAction } = chatActions;
 
-function Board(): ReactElement {
+function App(): ReactElement {
   const [input, setInput] = useState("");
   const boardReducer = useSelector<RootState, BoardState>(
     (state) => state.boardReducer
@@ -21,10 +21,6 @@ function Board(): ReactElement {
   const { messages, drawings } = boardReducer;
   const { connection, room } = connectionReducer;
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    joinRoomAction("room1");
-  }, []);
 
   const _handleConnect = (e: React.MouseEvent) => {
     console.log("start");
@@ -56,10 +52,13 @@ function Board(): ReactElement {
         <button onClick={_handleConnect}>Connect</button>
         <button onClick={_handleDisconnect}>Disconnect</button>
         <select value={room} onChange={_handleChangeRoom}>
-          <option value={"room1"}>room1</option>
-          <option value={"room2"}>room2</option>
+          {room === "" && <option value="">none</option>}
+          <option value="room1">room1</option>
+          <option value="room2">room2</option>
         </select>
-        <div>{`isConnection: ${connection}${connection? `, ${room}`: ''}`}</div>
+        <div>{`isConnection: ${connection}${
+          room !== "" ? `, ${room}` : ""
+        }`}</div>
       </div>
       <WhiteBoard width={500} height={500} drawings={drawings} />
       {messages.map((message, index) => (
@@ -77,4 +76,4 @@ function Board(): ReactElement {
   );
 }
 
-export default Board;
+export default App;

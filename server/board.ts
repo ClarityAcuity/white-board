@@ -1,5 +1,19 @@
 import { v4 } from "uuid";
 import { Socket, Server } from "socket.io";
+import {
+  JOIN_ROOM,
+  UPDATE_ROOM,
+  BROADCAST_MESSAGE,
+  RECEIVE_BROADCAST_MESSAGE,
+  MESSAGE_ROOM,
+  RECEIVE_ROOM_MESSAGE,
+  MESSAGE_SELF,
+  RECEIVE_SELF_MESSAGE,
+  CREATE_DRAW,
+  UPDATE_DRAW,
+  FINISH_DRAW,
+  RECEIVE_UPDATE_DRAW,
+} from "../src/actions/action-types";
 
 type Message = string;
 type Id = string;
@@ -11,7 +25,7 @@ function broadcast(ws: Socket, message: Message, userId: Id): void {
   if (!message) return;
 
   console.log("broadcast:", message);
-  ws.broadcast.emit("UPDATE_BROADCAST_MESSAGE", { message, userId });
+  ws.broadcast.emit(RECEIVE_BROADCAST_MESSAGE, { message, userId });
 }
 
 function whichRoom(ws: Socket): Room {
@@ -23,19 +37,30 @@ function whichRoom(ws: Socket): Room {
 }
 
 function leftRoomMessage(ws: Socket, room: Room, userId: Id): void {
-  ws.to(room).emit("UPDATE_ROOM", `${userId} has left ${room}`);
+  const message = `${userId} has left ${room}`;
+
+  ws.to(room).emit(RECEIVE_ROOM_MESSAGE, { message, userId });
 }
+
+const updateDraw = (ws: Socket, userId: Id) => (action): void => {
+  const { type, draw } = action;
+  const inRoom = whichRoom(ws);
+  const message = `> ${userId}: ${type} ${draw.type} ${draw.id}`;
+
+  console.log("message:", message, draw);
+  ws.emit(RECEIVE_SELF_MESSAGE, { message });
+  ws.to(inRoom).emit(RECEIVE_UPDATE_DRAW, { draw });
+};
 
 export function board(ws: Socket, io: Server): void {
   const userId = v4();
 
   // Register user connection
   users.set("userId", userId);
-  console.log(users, ws.rooms);
+  console.log("user", users, ws.rooms);
   broadcast(ws, `> User with the id ${userId} is connected`, userId);
 
-  ws.on("JOIN_ROOM", (action) => {
-    console.log(action);
+  ws.on(JOIN_ROOM, (action) => {
     const inRoom = whichRoom(ws);
     if (inRoom) {
       ws.leave(inRoom);
@@ -43,37 +68,43 @@ export function board(ws: Socket, io: Server): void {
     }
 
     const { room } = action;
-    const message = `${userId} id added to ${room}！`;
+    const message = `!! ${userId} id added to ${room}`;
 
     ws.join(room);
-    io.in(room).emit("UPDATE_ROOM", { message, userId });
+    io.in(room).emit(UPDATE_ROOM, { room })
+    io.in(room).emit(RECEIVE_ROOM_MESSAGE, { message, userId });
   });
 
-  ws.on("BROADCAST_MESSAGE", (action) => {
-    console.log(action);
+  ws.on(BROADCAST_MESSAGE, (action) => {
     const { message: msg } = action;
     const message = typeof msg === "string" ? msg : "";
 
     broadcast(ws, `> ${userId}: ${message}`, userId);
   });
 
-  ws.on("MESSAGE_ROOM", (action) => {
+  ws.on(MESSAGE_ROOM, (action) => {
     const { message: msg } = action;
     const inRoom = whichRoom(ws);
     const message = `> ${inRoom}/${userId}: ${
       typeof msg === "string" ? msg : ""
     }`;
     console.log("message:", message);
-    ws.to(inRoom).emit("UPDATE_ROOM", { message, userId });
+    ws.to(inRoom).emit(RECEIVE_ROOM_MESSAGE, { message, userId });
   });
 
-  ws.on("MESSAGE_SELF", (action) => {
+  ws.on(MESSAGE_SELF, (action) => {
     const { message: msg } = action;
     const message = `> ${userId}: ${typeof msg === "string" ? msg : ""}`;
 
     console.log("message:", message);
-    ws.emit("UPDATE_SELF_MESSAGE", { message });
+    ws.emit(RECEIVE_SELF_MESSAGE, { message });
   });
+
+  ws.on(CREATE_DRAW, updateDraw(ws, userId));
+
+  ws.on(UPDATE_DRAW, updateDraw(ws, userId));
+
+  ws.on(FINISH_DRAW, updateDraw(ws, userId));
 
   //A special namespace "disconnect" for when a client disconnects
   ws.on("disconnect", (reason) => {

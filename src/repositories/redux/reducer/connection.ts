@@ -1,4 +1,10 @@
-import { CONNECT, DISCONNECT, JOIN_ROOM, Action, Room } from "../../../actions";
+import {
+  CONNECT,
+  DISCONNECT,
+  UPDATE_ROOM,
+  Action,
+  Room,
+} from "../../../actions/action-types";
 
 export type ConnectionState = {
   readonly connection: boolean;
@@ -7,7 +13,7 @@ export type ConnectionState = {
 
 const initialState = {
   connection: false,
-  room: "room1",
+  room: "",
 };
 
 export default function connectionReducer(
@@ -18,9 +24,10 @@ export default function connectionReducer(
     case CONNECT:
       return { ...state, connection: true };
     case DISCONNECT:
-      return { ...state, connection: false };
-    case JOIN_ROOM:
+      return { ...state, connection: false, room: "" };
+    case UPDATE_ROOM:
       return { ...state, room: action.room };
+
     default:
       return state;
   }

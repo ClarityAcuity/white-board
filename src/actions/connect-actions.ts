@@ -2,11 +2,9 @@ import {
   CONNECT,
   DISCONNECT,
   JOIN_ROOM,
-  UPDATE_ROOM,
   Action,
   Emitter,
   Room,
-  Message,
 } from "./action-types";
 import { Dispatch } from "redux";
 import { socket } from "../socket";
@@ -53,12 +51,5 @@ export function joinRoomAction(room: Room): Action {
   return {
     type: JOIN_ROOM,
     room,
-  };
-}
-
-export function updateRoom(message: Message): Action {
-  return {
-    type: UPDATE_ROOM,
-    message,
   };
 }

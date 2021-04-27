@@ -1,4 +1,25 @@
-# Custom Express Server example
+# Web White Board
+
+- Start server
+
+```bash
+# install packages
+npm i
+
+# dev server
+npm run dev
+
+# production build
+npm run build
+npm start
+```
+
+- Open two `http://localhost:3000/` tab
+- Click `connect` button
+- Select `room` options
+- Click `line` or `rect` button to draw on white board
+
+## Custom Express Server example
 
 Most of the time the default Next.js server will be enough but there are times you'll want to run your own server to customize routes or other kinds of app behavior. Next.js provides [Custom server and routing](https://github.com/vercel/next.js#custom-server-and-routing) options, so you can customize as much as you want.
 

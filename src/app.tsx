@@ -23,7 +23,6 @@ function App(): ReactElement {
   const dispatch = useDispatch();
 
   const _handleConnect = (e: React.MouseEvent) => {
-    console.log("start");
     e.preventDefault();
     dispatch(startConnect());
   };
@@ -36,7 +35,6 @@ function App(): ReactElement {
   const _handleChangeRoom = (e: React.ChangeEvent) => {
     const { value } = e.target as HTMLSelectElement;
     if (value) {
-      console.log(value);
       dispatch(joinRoomAction(value));
     }
   };

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ReactElement } from "react";
+import React, { useState, useEffect, useCallback, ReactElement } from "react";
 import { useDispatch } from "react-redux";
 import { throttle } from "lodash";
 import Menu from "../menu";
@@ -6,11 +6,17 @@ import useScratch, {
   ScratchSensorParams,
   ScratchSensorState,
 } from "../../hooks/use-scratch";
-import { DrawStatusEnums, Mode, Draw, LineDraw, RectDraw } from "../../actions/action-types";
+import {
+  DrawStatusEnums,
+  Mode,
+  Draw,
+  LineDraw,
+  RectDraw,
+} from "../../actions/action-types";
 import { drawActions } from "../../actions";
 
 const { createDraw, updateDraw, finishDraw } = drawActions;
-const { CREATED } = DrawStatusEnums
+const { CREATED } = DrawStatusEnums;
 
 interface WhiteBoard {
   width: number;
@@ -19,22 +25,13 @@ interface WhiteBoard {
 }
 
 const WhiteBoard = ({ width, height, drawings }: WhiteBoard): ReactElement => {
-  const onScratch = useCallback(
-    throttle((state: ScratchSensorState) => {
-      console.log("update", state);
-      _updateDrawing(state);
-    }, 100),
-    [drawings.length]
-  );
   const params: ScratchSensorParams = {
     disabled: false,
-    onScratch,
+    onScratch: () => {}, // Don't want to dispatch action in setState
     onScratchStart: (state: ScratchSensorState) => {
-      console.log("start", state);
       _createDrawing(state);
     },
     onScratchEnd: (state: ScratchSensorState) => {
-      console.log("end", state);
       _finishDrawing(state);
     },
   };
@@ -42,6 +39,17 @@ const WhiteBoard = ({ width, height, drawings }: WhiteBoard): ReactElement => {
   const [ref, state] = useScratch(params);
   const { dx, dy, x, y } = state;
   const dispatch = useDispatch();
+
+  const onUpdateDrawing = useCallback(
+    throttle((state: ScratchSensorState) => {
+      _updateDrawing(state);
+    }, 100),
+    [drawings.length]
+  );
+
+  useEffect(() => {
+    onUpdateDrawing(state);
+  }, [state]);
 
   function _createDrawing(state) {
     const nextId = drawings.length + 1 + "";
@@ -112,7 +120,7 @@ const WhiteBoard = ({ width, height, drawings }: WhiteBoard): ReactElement => {
   function _renderDrawings() {
     return drawings.map((draw) => {
       const { type, status } = draw;
-      const hasShape = status !== CREATED
+      const hasShape = status !== CREATED;
       if (!hasShape) {
         return null;
       }

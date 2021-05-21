@@ -12,7 +12,9 @@ import {
   CREATE_DRAW,
   UPDATE_DRAW,
   FINISH_DRAW,
+  SELECT_DRAW,
   RECEIVE_UPDATE_DRAW,
+  RECEIVE_SELECT_DRAW,
 } from "../src/actions/action-types";
 
 type Message = string;
@@ -42,14 +44,14 @@ function leftRoomMessage(ws: Socket, room: Room, userId: Id): void {
   ws.to(room).emit(RECEIVE_ROOM_MESSAGE, { message, userId });
 }
 
-const updateDraw = (ws: Socket, userId: Id) => (action): void => {
+const emitDraw = (ws: Socket, userId: Id, emitter) => (action): void => {
   const { type, draw } = action;
   const inRoom = whichRoom(ws);
   const message = `> ${userId}: ${type} ${draw.type} ${draw.id}`;
 
   console.log("message:", message, draw);
   ws.emit(RECEIVE_SELF_MESSAGE, { message });
-  ws.to(inRoom).emit(RECEIVE_UPDATE_DRAW, { draw });
+  ws.to(inRoom).emit(emitter, { draw });
 };
 
 export function board(ws: Socket, io: Server): void {
@@ -100,11 +102,13 @@ export function board(ws: Socket, io: Server): void {
     ws.emit(RECEIVE_SELF_MESSAGE, { message });
   });
 
-  ws.on(CREATE_DRAW, updateDraw(ws, userId));
+  ws.on(CREATE_DRAW, emitDraw(ws, userId, RECEIVE_UPDATE_DRAW));
 
-  ws.on(UPDATE_DRAW, updateDraw(ws, userId));
+  ws.on(UPDATE_DRAW, emitDraw(ws, userId, RECEIVE_UPDATE_DRAW));
 
-  ws.on(FINISH_DRAW, updateDraw(ws, userId));
+  ws.on(FINISH_DRAW, emitDraw(ws, userId, RECEIVE_UPDATE_DRAW));
+
+  ws.on(SELECT_DRAW, emitDraw(ws, userId, RECEIVE_SELECT_DRAW));
 
   //A special namespace "disconnect" for when a client disconnects
   ws.on("disconnect", (reason) => {

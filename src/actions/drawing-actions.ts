@@ -2,10 +2,11 @@ import {
   CREATE_DRAW,
   UPDATE_DRAW,
   FINISH_DRAW,
+  SELECT_DRAW,
   DrawStatusEnums,
 } from "./action-types";
 
-const { CREATED, UPDATED, FINISHED } = DrawStatusEnums;
+const { CREATED, UPDATED, FINISHED, SELECTED } = DrawStatusEnums;
 
 export function createDraw({ id, type, status = CREATED }) {
   const draw = { id, type, status };
@@ -30,6 +31,15 @@ export function finishDraw({ id, type, status = FINISHED, ...drawing }) {
 
   return {
     type: FINISH_DRAW,
+    draw,
+  };
+}
+
+export function selectDraw({ id, type, ...drawing }) {
+  const draw = { id, type, ...drawing, status: SELECTED };
+
+  return {
+    type: SELECT_DRAW,
     draw,
   };
 }

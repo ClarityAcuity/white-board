@@ -15,6 +15,7 @@ import {
   RECEIVE_SELF_MESSAGE,
   UPDATE_ROOM,
   RECEIVE_UPDATE_DRAW,
+  RECEIVE_SELECT_DRAW,
 } from "../actions/action-types";
 
 type AnyFunction = (...args: unknown[]) => unknown;
@@ -27,6 +28,7 @@ const events = [
   RECEIVE_SELF_MESSAGE,
   UPDATE_ROOM,
   RECEIVE_UPDATE_DRAW,
+  RECEIVE_SELECT_DRAW,
 ];
 
 function createSocketIoMiddleware(

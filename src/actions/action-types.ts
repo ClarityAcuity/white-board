@@ -6,12 +6,14 @@ export type Room = string;
 export type GetState = () => RootState;
 export type Emitter = (dispatch: Dispatch, getState: GetState) => void;
 
+export type Select = "select";
 export type Line = "line";
 export type Rect = "rect";
-export type Mode = Line | Rect;
+export type Mode = Select | Line | Rect;
 export type CREATED = "created"
 export type UPDATED = "updated"
 export type FINISHED = "finished"
+export type SELECTED = "selected"
 export interface Draw {
   id: string;
   type: Line | Rect;
@@ -54,10 +56,13 @@ export const UPDATE_ROOM = "UPDATE_ROOM";
 export const CREATE_DRAW = "CREATE_DRAW";
 export const UPDATE_DRAW = "UPDATE_DRAW";
 export const FINISH_DRAW = "FINISH_DRAW";
+export const SELECT_DRAW = "SELECT_DRAW";
 export const RECEIVE_UPDATE_DRAW = "RECEIVE_UPDATE_DRAW";
+export const RECEIVE_SELECT_DRAW = "RECEIVE_SELECT_DRAW";
 
 export const DrawStatusEnums = {
   CREATED: "created" as CREATED,
   UPDATED: "updated" as UPDATED,
   FINISHED: "finished" as FINISHED,
+  SELECTED: "selected" as SELECTED,
 }

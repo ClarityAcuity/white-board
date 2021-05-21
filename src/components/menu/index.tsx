@@ -1,29 +1,42 @@
 import React, { ReactElement } from "react";
 import cx from "classnames";
 import { Mode } from "../../actions/action-types";
-import styles from './menu.module.css'
+import styles from "./menu.module.css";
 
 interface Menu {
   mode: Mode;
   onChange: (mode: Mode) => void;
-};
+}
 
 const Menu = ({ mode, onChange }: Menu): ReactElement => {
   return (
     <div className={styles.menu}>
       <button
-        className={cx(styles.line, { [styles[`line--drawing`]]: mode === "line" })}
+        className={cx(styles.select, { [styles[`select--selecting`]]: mode === "select" })}
+        onClick={() => onChange("select")}
+      >
+        select
+      </button>
+      <button
+        className={cx(styles.line, {
+          [styles[`line--drawing`]]: mode === "line",
+        })}
         onClick={() => onChange("line")}
       >
         line
       </button>
       <button
-        className={cx(styles.rect, { [styles[`rect--drawing`]]: mode === "rect" })}
+        className={cx(styles.rect, {
+          [styles[`rect--drawing`]]: mode === "rect",
+        })}
         onClick={() => onChange("rect")}
       >
         rect
       </button>
-      <div>{mode && `drawing ${mode} ...`}</div>
+      <div>
+        {mode && mode !== "select" && `drawing ${mode} ...`}
+        {mode === "select" && "selecting"}
+      </div>
     </div>
   );
 };

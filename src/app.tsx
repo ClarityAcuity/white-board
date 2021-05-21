@@ -18,7 +18,7 @@ function App(): ReactElement {
   const connectionReducer = useSelector<RootState, ConnectionState>(
     (state) => state.connectionReducer
   );
-  const { messages, drawings } = boardReducer;
+  const { messages, selectedDraw, drawings } = boardReducer;
   const { connection, room } = connectionReducer;
   const dispatch = useDispatch();
 
@@ -58,7 +58,7 @@ function App(): ReactElement {
           room !== "" ? `, ${room}` : ""
         }`}</div>
       </div>
-      <WhiteBoard width={500} height={500} drawings={drawings} />
+      <WhiteBoard width={500} height={500} selectedDraw={selectedDraw} drawings={drawings} />
       {messages.map((message, index) => (
         <div key={index}>{message}</div>
       ))}

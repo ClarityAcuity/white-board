@@ -2,11 +2,13 @@
   display: flex;
 }
 
+.select,
 .line,
 .rect {
   margin-right: 8px;
 }
 
+.select--selecting,
 .rect--drawing,
 .line--drawing {
   background: black;

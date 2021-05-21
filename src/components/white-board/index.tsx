@@ -15,16 +15,17 @@ import {
 } from "../../actions/action-types";
 import { drawActions } from "../../actions";
 
-const { createDraw, updateDraw, finishDraw } = drawActions;
-const { CREATED } = DrawStatusEnums;
+const { createDraw, updateDraw, finishDraw, selectDraw } = drawActions;
+const { CREATED, SELECTED } = DrawStatusEnums;
 
 interface WhiteBoard {
   width: number;
   height: number;
+  selectedDraw: LineDraw | RectDraw | Draw;
   drawings: Array<LineDraw | RectDraw | Draw>;
 }
 
-const WhiteBoard = ({ width, height, drawings }: WhiteBoard): ReactElement => {
+const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): ReactElement => {
   const params: ScratchSensorParams = {
     disabled: false,
     onScratch: () => {}, // Don't want to dispatch action in setState
@@ -35,7 +36,7 @@ const WhiteBoard = ({ width, height, drawings }: WhiteBoard): ReactElement => {
       _finishDrawing(state);
     },
   };
-  const [mode, setMode] = useState<Mode>();
+  const [mode, setMode] = useState<Mode>("select");
   const [ref, state] = useScratch(params);
   const { dx, dy, x, y } = state;
   const dispatch = useDispatch();
@@ -97,23 +98,75 @@ const WhiteBoard = ({ width, height, drawings }: WhiteBoard): ReactElement => {
     }
   }
 
+  function _selectDraw(draw) {
+    if (mode === "select") {
+      console.log(draw);
+      dispatch(selectDraw(draw));
+    }
+  }
+
+  function _drawSelectable(draw) {
+    const { id, x, y, width, height, onSelect, status } = draw;
+    const isScaleUp = width <= 10 && height <= 10;
+
+    console.log(selectedDraw, status)
+    if (mode === "select" || status === SELECTED) {
+      const isSelected = id === selectedDraw?.id;
+      return (
+        <rect
+          x={isScaleUp ? x + width / 2 - 5 : x}
+          y={isScaleUp ? y + height / 2 - 5 : y}
+          width={isScaleUp ? 10 : width}
+          height={isScaleUp ? 10 : height}
+          stroke={isSelected ? "red" : "grey"}
+          strokeDasharray="5,5"
+          fillOpacity="0.0"
+          onClick={onSelect}
+        />
+      );
+    }
+  }
+
   function _drawLine(line) {
-    const { id, x1, y1, x2, y2 } = line;
-    return <line key={id} x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" />;
+    const { id, x1, y1, x2, y2, status } = line;
+    return (
+      <g key={id}>
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" />
+        {_drawSelectable({
+          id,
+          status,
+          x: x1 < x2 ? x1 : x2,
+          y: y1 < y2 ? y1 : y2,
+          width: Math.abs(x2 - x1),
+          height: Math.abs(y2 - y1),
+          onSelect: () => _selectDraw(line),
+        })}
+      </g>
+    );
   }
 
   function _drawRect(rect) {
-    const { id, x, y, width, height } = rect;
+    const { id, x, y, width, height, status } = rect;
     return (
-      <rect
-        key={id}
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        stroke="black"
-        fill="azure"
-      />
+      <g key={id}>
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          stroke="black"
+          fill="azure"
+        />
+        {_drawSelectable({
+          id,
+          status,
+          x,
+          y,
+          width,
+          height,
+          onSelect: () => _selectDraw(rect),
+        })}
+      </g>
     );
   }
 

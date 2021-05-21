@@ -9,7 +9,9 @@ import {
   CREATE_DRAW,
   UPDATE_DRAW,
   FINISH_DRAW,
+  SELECT_DRAW,
   RECEIVE_UPDATE_DRAW,
+  RECEIVE_SELECT_DRAW,
   DrawStatusEnums,
   Action,
   Draw,
@@ -19,6 +21,7 @@ import {
 
 export type BoardState = {
   readonly messages: Array<string | undefined>;
+  selectedDraw: LineDraw | RectDraw | Draw;
   drawings: Array<LineDraw | RectDraw | Draw>;
 };
 
@@ -26,6 +29,7 @@ const { CREATED, FINISHED } = DrawStatusEnums;
 
 const initialState = {
   messages: [],
+  selectedDraw: {},
   drawings: [
     {
       id: "1",
@@ -70,34 +74,35 @@ export default function boardReducer(
     }
 
     case CREATE_DRAW: {
-      const { draw: newDraw } = action;
+      const { draw: selectedDraw } = action;
 
       return {
         ...state,
-        drawings: [...state.drawings, newDraw],
+        drawings: [...state.drawings, selectedDraw],
       };
     }
     case UPDATE_DRAW: {
-      const { draw: newDraw } = action;
+      const { draw: selectedDraw } = action;
       const { drawings: prevDrawings } = state;
       const drawings = prevDrawings.map((draw) => {
-        if (draw.id === newDraw.id && draw.status !== FINISHED) {
-          return newDraw;
+        if (draw.id === selectedDraw.id && draw.status !== FINISHED) {
+          return selectedDraw;
         }
         return draw;
       });
 
       return {
         ...state,
+        selectedDraw,
         drawings,
       };
     }
     case FINISH_DRAW: {
-      const { draw: newDraw } = action;
+      const { draw: selectedDraw } = action;
       const { drawings: prevDrawings } = state;
       const drawings = prevDrawings.map((draw) => {
-        if (draw.id === newDraw.id && draw.status !== newDraw.status) {
-          return { ...newDraw };
+        if (draw.id === selectedDraw.id && draw.status !== selectedDraw.status) {
+          return { ...selectedDraw };
         }
         return draw;
       });
@@ -108,18 +113,36 @@ export default function boardReducer(
       };
     }
     case RECEIVE_UPDATE_DRAW: {
-      const { draw: newDraw } = action;
+      const { draw: selectedDraw } = action;
       const { drawings } = state;
       const updatedDrawings = drawings.map((draw) => {
-        if (draw.id === newDraw.id && draw.status !== FINISHED) {
-          return newDraw;
+        if (draw.id === selectedDraw.id && (draw.status !== FINISHED)) {
+          return selectedDraw;
         }
         return draw;
       });
 
       return {
         ...state,
-        drawings: newDraw.status !== CREATED ? updatedDrawings : [...drawings, newDraw],
+        selectedDraw,
+        drawings: selectedDraw.status !== CREATED ? updatedDrawings : [...drawings, selectedDraw],
+      };
+    }
+    case SELECT_DRAW:
+    case RECEIVE_SELECT_DRAW: {
+      const { draw: selectedDraw } = action;
+      const { drawings } = state;
+      const updatedDrawings = drawings.map((draw) => {
+        if (draw.id === selectedDraw.id) {
+          return selectedDraw;
+        }
+        return { ...draw, status: FINISHED};
+      });
+
+      return {
+        ...state,
+        selectedDraw,
+        drawings: updatedDrawings,
       };
     }
 

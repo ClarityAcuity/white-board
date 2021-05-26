@@ -1,10 +1,5 @@
-import {
-  BROADCAST_MESSAGE,
-  MESSAGE_ROOM,
-  MESSAGE_SELF,
-  Message,
-  Action,
-} from "./action-types";
+import { Message, Action } from "../types";
+import { BROADCAST_MESSAGE, MESSAGE_ROOM, MESSAGE_SELF } from "./action-types";
 
 export function broadcastMessageAction(message: Message): Action {
   return {

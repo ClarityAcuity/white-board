@@ -1,9 +1,8 @@
+import { Action, Room } from "../../../types";
 import {
   CONNECT,
   DISCONNECT,
   UPDATE_ROOM,
-  Action,
-  Room,
 } from "../../../actions/action-types";
 
 export type ConnectionState = {

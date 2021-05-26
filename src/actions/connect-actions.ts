@@ -1,11 +1,5 @@
-import {
-  CONNECT,
-  DISCONNECT,
-  JOIN_ROOM,
-  Action,
-  Emitter,
-  Room,
-} from "./action-types";
+import { Action, Emitter, Room } from "../types";
+import { CONNECT, DISCONNECT, JOIN_ROOM } from "./action-types";
 import { Dispatch } from "redux";
 import { socket } from "../socket";
 

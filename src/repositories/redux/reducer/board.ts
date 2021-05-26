@@ -1,3 +1,4 @@
+import { Action, Draw, LineDraw, RectDraw } from "../../../types";
 import {
   BROADCAST_MESSAGE,
   RECEIVE_BROADCAST_MESSAGE,
@@ -12,12 +13,8 @@ import {
   SELECT_DRAW,
   RECEIVE_UPDATE_DRAW,
   RECEIVE_SELECT_DRAW,
-  DrawStatusEnums,
-  Action,
-  Draw,
-  LineDraw,
-  RectDraw,
 } from "../../../actions/action-types";
+import { DrawStatusEnums } from "../../../constants";
 
 export type BoardState = {
   readonly messages: Array<string | undefined>;
@@ -29,7 +26,7 @@ const { CREATED, FINISHED } = DrawStatusEnums;
 
 const initialState = {
   messages: [],
-  selectedDraw: {},
+  selectedDraw: null,
   drawings: [
     {
       id: "1",
@@ -101,7 +98,10 @@ export default function boardReducer(
       const { draw: selectedDraw } = action;
       const { drawings: prevDrawings } = state;
       const drawings = prevDrawings.map((draw) => {
-        if (draw.id === selectedDraw.id && draw.status !== selectedDraw.status) {
+        if (
+          draw.id === selectedDraw.id &&
+          draw.status !== selectedDraw.status
+        ) {
           return { ...selectedDraw };
         }
         return draw;
@@ -116,7 +116,7 @@ export default function boardReducer(
       const { draw: selectedDraw } = action;
       const { drawings } = state;
       const updatedDrawings = drawings.map((draw) => {
-        if (draw.id === selectedDraw.id && (draw.status !== FINISHED)) {
+        if (draw.id === selectedDraw.id && draw.status !== FINISHED) {
           return selectedDraw;
         }
         return draw;
@@ -125,7 +125,10 @@ export default function boardReducer(
       return {
         ...state,
         selectedDraw,
-        drawings: selectedDraw.status !== CREATED ? updatedDrawings : [...drawings, selectedDraw],
+        drawings:
+          selectedDraw.status !== CREATED
+            ? updatedDrawings
+            : [...drawings, selectedDraw],
       };
     }
     case SELECT_DRAW:
@@ -136,7 +139,7 @@ export default function boardReducer(
         if (draw.id === selectedDraw.id) {
           return selectedDraw;
         }
-        return { ...draw, status: FINISHED};
+        return { ...draw, status: FINISHED };
       });
 
       return {

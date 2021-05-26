@@ -6,18 +6,12 @@ import useScratch, {
   ScratchSensorParams,
   ScratchSensorState,
 } from "../../hooks/use-scratch";
-import {
-  ModeEnums,
-  DrawStatusEnums,
-  Mode,
-  Draw,
-  LineDraw,
-  RectDraw,
-} from "../../actions/action-types";
+import { Mode, Draw, LineDraw, RectDraw } from "../../types";
 import { drawActions } from "../../actions";
+import { ModeEnums, DrawStatusEnums } from "../../constants";
 
 const { createDraw, updateDraw, finishDraw, selectDraw } = drawActions;
-const { SELECT, LINE, RECT } = ModeEnums
+const { SELECT, LINE, RECT } = ModeEnums;
 const { CREATED, SELECTED } = DrawStatusEnums;
 
 interface WhiteBoard {
@@ -27,7 +21,12 @@ interface WhiteBoard {
   drawings: Array<LineDraw | RectDraw | Draw>;
 }
 
-const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): ReactElement => {
+const WhiteBoard = ({
+  width,
+  height,
+  selectedDraw,
+  drawings,
+}: WhiteBoard): ReactElement => {
   const params: ScratchSensorParams = {
     disabled: false,
     onScratch: () => {}, // Don't want to dispatch action in setState

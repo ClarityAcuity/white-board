@@ -3,8 +3,8 @@ import {
   UPDATE_DRAW,
   FINISH_DRAW,
   SELECT_DRAW,
-  DrawStatusEnums,
 } from "./action-types";
+import { DrawStatusEnums } from "../constants";
 
 const { CREATED, UPDATED, FINISHED, SELECTED } = DrawStatusEnums;
 

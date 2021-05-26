@@ -1,9 +1,10 @@
 import React, { ReactElement } from "react";
 import cx from "classnames";
-import { ModeEnums, Mode } from "../../actions/action-types";
+import { Mode } from "../../types";
+import { ModeEnums } from "../../constants";
 import styles from "./menu.module.css";
 
-const { SELECT, LINE, RECT } = ModeEnums
+const { SELECT, LINE, RECT } = ModeEnums;
 interface Menu {
   mode: Mode;
   onChange: (mode: Mode) => void;
@@ -13,7 +14,9 @@ const Menu = ({ mode, onChange }: Menu): ReactElement => {
   return (
     <div className={styles.menu}>
       <button
-        className={cx(styles.select, { [styles[`select--selecting`]]: mode === SELECT })}
+        className={cx(styles.select, {
+          [styles[`select--selecting`]]: mode === SELECT,
+        })}
         onClick={() => onChange(SELECT)}
       >
         select

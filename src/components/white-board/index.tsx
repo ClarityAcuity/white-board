@@ -7,6 +7,7 @@ import useScratch, {
   ScratchSensorState,
 } from "../../hooks/use-scratch";
 import {
+  ModeEnums,
   DrawStatusEnums,
   Mode,
   Draw,
@@ -16,6 +17,7 @@ import {
 import { drawActions } from "../../actions";
 
 const { createDraw, updateDraw, finishDraw, selectDraw } = drawActions;
+const { SELECT, LINE, RECT } = ModeEnums
 const { CREATED, SELECTED } = DrawStatusEnums;
 
 interface WhiteBoard {
@@ -36,7 +38,7 @@ const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): Reac
       _finishDrawing(state);
     },
   };
-  const [mode, setMode] = useState<Mode>("select");
+  const [mode, setMode] = useState<Mode>(SELECT);
   const [ref, state] = useScratch(params);
   const { dx, dy, x, y } = state;
   const dispatch = useDispatch();
@@ -45,7 +47,7 @@ const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): Reac
     throttle((state: ScratchSensorState) => {
       _updateDrawing(state);
     }, 100),
-    [drawings.length]
+    [drawings]
   );
 
   useEffect(() => {
@@ -71,7 +73,7 @@ const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): Reac
   }
 
   function _nextLineDrawing(id, action, state) {
-    if (mode === "line") {
+    if (mode === LINE) {
       const nextDrawing = {
         id,
         type: mode,
@@ -85,7 +87,7 @@ const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): Reac
   }
 
   function _nextRectDrawing(id, action, state) {
-    if (mode === "rect") {
+    if (mode === RECT) {
       const nextDrawing = {
         id,
         type: mode,
@@ -99,7 +101,7 @@ const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): Reac
   }
 
   function _selectDraw(draw) {
-    if (mode === "select") {
+    if (mode === SELECT) {
       console.log(draw);
       dispatch(selectDraw(draw));
     }
@@ -109,8 +111,7 @@ const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): Reac
     const { id, x, y, width, height, onSelect, status } = draw;
     const isScaleUp = width <= 10 && height <= 10;
 
-    console.log(selectedDraw, status)
-    if (mode === "select" || status === SELECTED) {
+    if (mode === SELECT || status === SELECTED) {
       const isSelected = id === selectedDraw?.id;
       return (
         <rect
@@ -177,10 +178,10 @@ const WhiteBoard = ({ width, height, selectedDraw, drawings }: WhiteBoard): Reac
       if (!hasShape) {
         return null;
       }
-      if (type === "line") {
+      if (type === LINE) {
         return _drawLine(draw);
       }
-      if (type === "rect") {
+      if (type === RECT) {
         return _drawRect(draw);
       }
     });

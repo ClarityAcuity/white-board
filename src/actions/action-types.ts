@@ -10,14 +10,14 @@ export type Select = "select";
 export type Line = "line";
 export type Rect = "rect";
 export type Mode = Select | Line | Rect;
-export type CREATED = "created"
-export type UPDATED = "updated"
-export type FINISHED = "finished"
-export type SELECTED = "selected"
+export type Created = "created";
+export type Updated = "updated";
+export type Finished = "finished";
+export type Selected = "selected";
 export interface Draw {
   id: string;
   type: Line | Rect;
-  status: CREATED | UPDATED | FINISHED
+  status: Created | Updated | Finished;
 }
 export interface LineDraw extends Draw {
   type: Line;
@@ -60,9 +60,15 @@ export const SELECT_DRAW = "SELECT_DRAW";
 export const RECEIVE_UPDATE_DRAW = "RECEIVE_UPDATE_DRAW";
 export const RECEIVE_SELECT_DRAW = "RECEIVE_SELECT_DRAW";
 
+export const ModeEnums = {
+  SELECT: "select" as Select,
+  LINE: "line" as Line,
+  RECT: "rect" as Rect,
+};
+
 export const DrawStatusEnums = {
-  CREATED: "created" as CREATED,
-  UPDATED: "updated" as UPDATED,
-  FINISHED: "finished" as FINISHED,
-  SELECTED: "selected" as SELECTED,
-}
+  CREATED: "created" as Created,
+  UPDATED: "updated" as Updated,
+  FINISHED: "finished" as Finished,
+  SELECTED: "selected" as Selected,
+};

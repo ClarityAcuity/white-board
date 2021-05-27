@@ -6,6 +6,7 @@ import useScratch, {
   ScratchSensorParams,
   ScratchSensorState,
 } from "../../hooks/use-scratch";
+import Selectable from "../selectable";
 import { Mode, Draw, LineDraw, RectDraw } from "../../types";
 import { drawActions } from "../../actions";
 import { ModeEnums, DrawStatusEnums } from "../../constants";
@@ -38,16 +39,14 @@ const WhiteBoard = ({
     },
   };
   const [mode, setMode] = useState<Mode>(SELECT);
+  const [movingDraw, setMovingDraw] = useState<LineDraw | RectDraw | Draw>();
   const [ref, state] = useScratch(params);
   const { dx, dy, x, y } = state;
   const dispatch = useDispatch();
 
-  const onUpdateDrawing = useCallback(
-    throttle((state: ScratchSensorState) => {
-      _updateDrawing(state);
-    }, 100),
-    [drawings]
-  );
+  const onUpdateDrawing = throttle((state: ScratchSensorState) => {
+    _updateDrawing(state);
+  }, 100);
 
   useEffect(() => {
     onUpdateDrawing(state);
@@ -60,15 +59,54 @@ const WhiteBoard = ({
   }
 
   function _updateDrawing(state) {
-    const id = drawings.length + "";
-    _nextLineDrawing(id, updateDraw, state);
-    _nextRectDrawing(id, updateDraw, state);
+    if (mode === SELECT) {
+      _updateLineDrawing(updateDraw, state);
+      _updateRectDrawing(updateDraw, state);
+    } else {
+      const id = drawings.length + "";
+      _nextLineDrawing(id, updateDraw, state);
+      _nextRectDrawing(id, updateDraw, state);
+    }
   }
 
   function _finishDrawing(state) {
-    const id = drawings.length + "";
-    _nextLineDrawing(id, finishDraw, state);
-    _nextRectDrawing(id, finishDraw, state);
+    if (mode === SELECT) {
+      setMovingDraw(null);
+      _updateLineDrawing(finishDraw, state);
+      _updateRectDrawing(finishDraw, state);
+    } else {
+      const id = drawings.length + "";
+      _nextLineDrawing(id, finishDraw, state);
+      _nextRectDrawing(id, finishDraw, state);
+    }
+  }
+
+  function _updateLineDrawing(action, state) {
+    const { type, x1, x2, y1, y2 } = (movingDraw as LineDraw) || {};
+    const { dx, dy, isScratching } = state;
+    if (type === LINE && isScratching) {
+      const nextDrawing = {
+        ...selectedDraw,
+        x1: x1 + dx,
+        y1: y1 + dy,
+        x2: x2 + dx,
+        y2: y2 + dy,
+      };
+      dispatch(action(nextDrawing));
+    }
+  }
+
+  function _updateRectDrawing(action, state) {
+    const { type, x, y } = (movingDraw as RectDraw) || {};
+    const { dx, dy, isScratching } = state;
+    if (type === RECT && isScratching) {
+      const nextDrawing = {
+        ...selectedDraw,
+        x: x + dx,
+        y: y + dy,
+      };
+      dispatch(action(nextDrawing));
+    }
   }
 
   function _nextLineDrawing(id, action, state) {
@@ -101,52 +139,36 @@ const WhiteBoard = ({
 
   function _selectDraw(draw) {
     if (mode === SELECT) {
-      console.log(draw);
+      setMovingDraw(draw);
       dispatch(selectDraw(draw));
     }
   }
 
   function _drawSelectable(draw) {
-    const { id, x, y, width, height, onSelect, status } = draw;
-    const isScaleUp = width <= 10 && height <= 10;
-
+    const { id, status } = draw;
     if (mode === SELECT || status === SELECTED) {
-      const isSelected = id === selectedDraw?.id;
       return (
-        <rect
-          x={isScaleUp ? x + width / 2 - 5 : x}
-          y={isScaleUp ? y + height / 2 - 5 : y}
-          width={isScaleUp ? 10 : width}
-          height={isScaleUp ? 10 : height}
-          stroke={isSelected ? "red" : "grey"}
-          strokeDasharray="5,5"
-          fillOpacity="0.0"
-          onClick={onSelect}
+        <Selectable
+          draw={draw}
+          isSelected={id === selectedDraw?.id}
+          onSelect={_selectDraw}
         />
       );
     }
   }
 
   function _drawLine(line) {
-    const { id, x1, y1, x2, y2, status } = line;
+    const { id, x1, y1, x2, y2 } = line;
     return (
       <g key={id}>
         <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="black" />
-        {_drawSelectable({
-          id,
-          status,
-          x: x1 < x2 ? x1 : x2,
-          y: y1 < y2 ? y1 : y2,
-          width: Math.abs(x2 - x1),
-          height: Math.abs(y2 - y1),
-          onSelect: () => _selectDraw(line),
-        })}
+        {_drawSelectable(line)}
       </g>
     );
   }
 
   function _drawRect(rect) {
-    const { id, x, y, width, height, status } = rect;
+    const { id, x, y, width, height } = rect;
     return (
       <g key={id}>
         <rect
@@ -157,15 +179,7 @@ const WhiteBoard = ({
           stroke="black"
           fill="azure"
         />
-        {_drawSelectable({
-          id,
-          status,
-          x,
-          y,
-          width,
-          height,
-          onSelect: () => _selectDraw(rect),
-        })}
+        {_drawSelectable(rect)}
       </g>
     );
   }

@@ -9,6 +9,7 @@ export const MESSAGE_SELF = "MESSAGE_SELF";
 export const RECEIVE_SELF_MESSAGE = "RECEIVE_SELF_MESSAGE";
 export const JOIN_ROOM = "JOIN_ROOM";
 export const UPDATE_ROOM = "UPDATE_ROOM";
+export const UPDATE_BOARD = "UPDATE_BOARD";
 
 export const CREATE_DRAW = "CREATE_DRAW";
 export const UPDATE_DRAW = "UPDATE_DRAW";

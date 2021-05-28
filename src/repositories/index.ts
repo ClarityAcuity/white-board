@@ -14,6 +14,7 @@ import {
   RECEIVE_ROOM_MESSAGE,
   RECEIVE_SELF_MESSAGE,
   UPDATE_ROOM,
+  UPDATE_BOARD,
   RECEIVE_UPDATE_DRAW,
   RECEIVE_SELECT_DRAW,
 } from "../actions/action-types";
@@ -27,6 +28,7 @@ const events = [
   RECEIVE_ROOM_MESSAGE,
   RECEIVE_SELF_MESSAGE,
   UPDATE_ROOM,
+  UPDATE_BOARD,
   RECEIVE_UPDATE_DRAW,
   RECEIVE_SELECT_DRAW,
 ];
@@ -47,7 +49,7 @@ function createSocketIoMiddleware(
       })
     );
     return (next: Dispatch) => (action: AnyAction) => {
-      console.log(action)
+      console.log(action);
       if (evaluate(action, criteria) && socket.connected) {
         return execute(action, emitBound, next, dispatch);
       }

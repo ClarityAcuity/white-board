@@ -38,5 +38,6 @@ export type Action = {
   type: string;
   message?: Message;
   room?: Room;
+  drawings?: Array<LineDraw | RectDraw>;
   draw?: LineDraw | RectDraw;
 };

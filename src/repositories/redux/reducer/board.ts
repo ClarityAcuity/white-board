@@ -7,6 +7,7 @@ import {
   MESSAGE_SELF,
   RECEIVE_SELF_MESSAGE,
   JOIN_ROOM,
+  UPDATE_BOARD,
   CREATE_DRAW,
   UPDATE_DRAW,
   FINISH_DRAW,
@@ -54,11 +55,11 @@ export default function boardReducer(
   action: Action
 ): BoardState {
   switch (action.type) {
-    case BROADCAST_MESSAGE:
-    case MESSAGE_ROOM:
-    case MESSAGE_SELF:
-    case JOIN_ROOM:
-      return state;
+    case UPDATE_BOARD: {
+      const { drawings } = action;
+
+      return { ...state, drawings };
+    }
     case RECEIVE_BROADCAST_MESSAGE:
     case RECEIVE_ROOM_MESSAGE:
     case RECEIVE_SELF_MESSAGE: {

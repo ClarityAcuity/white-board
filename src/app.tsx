@@ -7,7 +7,8 @@ import { ConnectionState } from "./repositories/redux/reducer/connection";
 import WhiteBoard from "./components/white-board";
 import styles from "./app.module.css";
 
-const { startConnect, closeConnect, joinRoomAction } = connectActions;
+const { startConnectAction, closeConnectAction, joinRoomAction } =
+  connectActions;
 const { messageRoomAction } = chatActions;
 
 function App(): ReactElement {
@@ -24,12 +25,12 @@ function App(): ReactElement {
 
   const _handleConnect = (e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch(startConnect());
+    dispatch(startConnectAction());
   };
 
   const _handleDisconnect = (e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch(closeConnect());
+    dispatch(closeConnectAction());
   };
 
   const _handleChangeRoom = (e: React.ChangeEvent) => {
@@ -58,7 +59,12 @@ function App(): ReactElement {
           room !== "" ? `, ${room}` : ""
         }`}</div>
       </div>
-      <WhiteBoard width={500} height={500} selectedDraw={selectedDraw} drawings={drawings} />
+      <WhiteBoard
+        width={500}
+        height={500}
+        selectedDraw={selectedDraw}
+        drawings={drawings}
+      />
       {messages.map((message, index) => (
         <div key={index}>{message}</div>
       ))}

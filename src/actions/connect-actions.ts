@@ -1,5 +1,5 @@
 import { Action, Emitter, Room } from "../types";
-import { CONNECT, DISCONNECT, JOIN_ROOM } from "./action-types";
+import { CONNECT, DISCONNECT, JOIN_ROOM, UPDATE_ROOM } from "./action-types";
 import { Dispatch } from "redux";
 import { socket } from "../socket";
 
@@ -9,7 +9,7 @@ export function connectAction(): Action {
   };
 }
 
-export function startConnect(): Emitter {
+export function startConnectAction(): Emitter {
   return (dispatch, getState) => {
     const {
       connectionReducer: { connection },
@@ -28,7 +28,7 @@ export function disconnectAction(): Action {
   };
 }
 
-export function closeConnect(): Emitter {
+export function closeConnectAction(): Emitter {
   return (dispatch: Dispatch, getState): void => {
     const {
       connectionReducer: { connection },
@@ -41,9 +41,14 @@ export function closeConnect(): Emitter {
   };
 }
 
-export function joinRoomAction(room: Room): Action {
-  return {
-    type: JOIN_ROOM,
+function changeRoomAction(type: string) {
+  return (room: Room): Action => ({
+    type,
     room,
-  };
+  });
 }
+
+export const joinRoomAction = changeRoomAction(JOIN_ROOM);
+
+// those actions below dispatch by socketIoMiddleware
+export const updateRoomAction = changeRoomAction(UPDATE_ROOM);

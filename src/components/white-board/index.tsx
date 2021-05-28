@@ -11,7 +11,12 @@ import { Mode, Draw, LineDraw, RectDraw } from "../../types";
 import { drawActions } from "../../actions";
 import { ModeEnums, DrawStatusEnums } from "../../constants";
 
-const { createDraw, updateDraw, finishDraw, selectDraw } = drawActions;
+const {
+  createDrawAction,
+  updateDrawAction,
+  finishDrawAction,
+  selectDrawAction,
+} = drawActions;
 const { SELECT, LINE, RECT } = ModeEnums;
 const { CREATED, SELECTED } = DrawStatusEnums;
 
@@ -54,30 +59,30 @@ const WhiteBoard = ({
 
   function _createDrawing(state) {
     const nextId = drawings.length + 1 + "";
-    _nextLineDrawing(nextId, createDraw, state);
-    _nextRectDrawing(nextId, createDraw, state);
+    _nextLineDrawing(nextId, createDrawAction, state);
+    _nextRectDrawing(nextId, createDrawAction, state);
   }
 
   function _updateDrawing(state) {
     if (mode === SELECT) {
-      _updateLineDrawing(updateDraw, state);
-      _updateRectDrawing(updateDraw, state);
+      _updateLineDrawing(updateDrawAction, state);
+      _updateRectDrawing(updateDrawAction, state);
     } else {
       const id = drawings.length + "";
-      _nextLineDrawing(id, updateDraw, state);
-      _nextRectDrawing(id, updateDraw, state);
+      _nextLineDrawing(id, updateDrawAction, state);
+      _nextRectDrawing(id, updateDrawAction, state);
     }
   }
 
   function _finishDrawing(state) {
     if (mode === SELECT) {
       setMovingDraw(null);
-      _updateLineDrawing(finishDraw, state);
-      _updateRectDrawing(finishDraw, state);
+      _updateLineDrawing(finishDrawAction, state);
+      _updateRectDrawing(finishDrawAction, state);
     } else {
       const id = drawings.length + "";
-      _nextLineDrawing(id, finishDraw, state);
-      _nextRectDrawing(id, finishDraw, state);
+      _nextLineDrawing(id, finishDrawAction, state);
+      _nextRectDrawing(id, finishDrawAction, state);
     }
   }
 
@@ -140,7 +145,7 @@ const WhiteBoard = ({
   function _selectDraw(draw) {
     if (mode === SELECT) {
       setMovingDraw(draw);
-      dispatch(selectDraw(draw));
+      dispatch(selectDrawAction(draw));
     }
   }
 

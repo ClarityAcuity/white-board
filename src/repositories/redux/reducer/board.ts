@@ -1,12 +1,8 @@
 import { Action, Draw, LineDraw, RectDraw } from "../../../types";
 import {
-  BROADCAST_MESSAGE,
   RECEIVE_BROADCAST_MESSAGE,
-  MESSAGE_ROOM,
   RECEIVE_ROOM_MESSAGE,
-  MESSAGE_SELF,
   RECEIVE_SELF_MESSAGE,
-  JOIN_ROOM,
   UPDATE_BOARD,
   CREATE_DRAW,
   UPDATE_DRAW,
@@ -28,26 +24,7 @@ const { CREATED, FINISHED } = DrawStatusEnums;
 const initialState = {
   messages: [],
   selectedDraw: null,
-  drawings: [
-    {
-      id: "1",
-      type: "line",
-      status: "finished",
-      x1: 0,
-      y1: 80,
-      x2: 100,
-      y2: 20,
-    } as LineDraw,
-    {
-      id: "2",
-      type: "rect",
-      status: "finished",
-      width: 100,
-      height: 100,
-      x: 120,
-      y: 100,
-    } as RectDraw,
-  ],
+  drawings: [],
 };
 
 export default function boardReducer(
@@ -55,11 +32,6 @@ export default function boardReducer(
   action: Action
 ): BoardState {
   switch (action.type) {
-    case UPDATE_BOARD: {
-      const { drawings } = action;
-
-      return { ...state, drawings };
-    }
     case RECEIVE_BROADCAST_MESSAGE:
     case RECEIVE_ROOM_MESSAGE:
     case RECEIVE_SELF_MESSAGE: {
@@ -69,6 +41,11 @@ export default function boardReducer(
         ...state,
         messages: [...state.messages, message],
       };
+    }
+    case UPDATE_BOARD: {
+      const { drawings } = action;
+
+      return { ...state, drawings };
     }
 
     case CREATE_DRAW: {

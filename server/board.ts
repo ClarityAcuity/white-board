@@ -64,6 +64,7 @@ const emitDraw =
 
     console.log("message:", message, draw);
     ws.emit(RECEIVE_SELF_MESSAGE, { message });
+    ws.in(inRoom).emit(RECEIVE_ROOM_MESSAGE, { message, userId });
     ws.to(inRoom).emit(emitter, { draw });
   };
 
@@ -83,7 +84,7 @@ export function board(ws: Socket, io: Server): void {
     }
 
     const { room } = action;
-    const message = `!! ${userId} id added to ${room}`;
+    const message = `!! ${userId} is added to ${room}`;
     const drawings = await load(room);
 
     ws.join(room);
@@ -106,6 +107,7 @@ export function board(ws: Socket, io: Server): void {
       typeof msg === "string" ? msg : ""
     }`;
     console.log("message:", message);
+    ws.emit(RECEIVE_SELF_MESSAGE, { message });
     ws.to(inRoom).emit(RECEIVE_ROOM_MESSAGE, { message, userId });
   });
 
